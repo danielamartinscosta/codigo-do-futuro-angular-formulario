@@ -11507,3 +11507,11 @@ html {
 .copyright {
   background-color: #1a252f;
 }
+
+.tabela {
+  
+  margin-left: 300px;
+  margin-right: 300px;
+  margin-bottom: 50px;
+  border: 2px solid #000;
+}
