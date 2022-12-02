@@ -13,6 +13,11 @@ import { FormatarCpfPipe } from './pipes/formatar-cpf.pipe';
 import { FormsModule } from '@angular/forms';
 import { FormComponent } from './paginas/form/form.component';
 import { ListaComponent } from './paginas/lista/lista.component';
+import { ClientesNotificacaoComponent } from './componentes/clientes-notificacao/clientes-notificacao.component';
+import { SobreComponent } from './paginas/sobre/sobre.component';
+import { PortfolioComponent } from './paginas/portfolio/portfolio.component';
+import { NaoEncontradaComponent } from './paginas/nao-encontrada/nao-encontrada.component';
+import {HttpClientModule} from '@angular/common/http'
 
 registerLocaleData(ptBR);
 
@@ -26,13 +31,18 @@ registerLocaleData(ptBR);
     FormatarTelefonePipe,
     FormatarCpfPipe,
     FormComponent,
-    ListaComponent
+    ListaComponent,
+    ClientesNotificacaoComponent,
+    SobreComponent,
+    PortfolioComponent,
+    NaoEncontradaComponent
 
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    FormsModule  //importado para poder usa o ngModel
+    FormsModule,  //importado para poder usa o ngModel
+    HttpClientModule
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'pt'},

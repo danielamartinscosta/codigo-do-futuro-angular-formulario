@@ -1,44 +1,50 @@
+import { HttpClient } from "@angular/common/http";
+import { environment } from "src/environments/environment";
 import { Cliente } from "../models/cliente";
 
+import { firstValueFrom } from 'rxjs';
+
 export class ClienteServico {
-    private static clientes: Cliente[] = []
+    static adicionarCliente(arg0: { id: number; nome: String; telefone: Number; endereco: String; data: Date; valor: Number; cpf: string; }) {
+      throw new Error('Method not implemented.');
+    }
+    static alteraCliente(cliente: Cliente) {
+      throw new Error('Method not implemented.');
+    }
+    static buscaClientesPorId(id: Number): Cliente {
+      throw new Error('Method not implemented.');
+    }
+    //static buscaClientes: any;
 
-    public static buscaClientes(): Cliente[] {
-        return ClienteServico.clientes;
+    constructor(private http: HttpClient) { }
+
+    public async lista(): Promise<Cliente[] | undefined> {
+        let clientes: Cliente[] | undefined = await firstValueFrom(this.http.get<Cliente[]>(`${environment.api}/clientes`)) //firstValueFrom substitui o toPromise que está depricated
+
+        return clientes;
     }
 
-    public static setCliente(cliente: Cliente): void {
-        ClienteServico.clientes.push(cliente);
-
-    }
-
-    public static adicionarCliente(cliente: Cliente): void {
-        cliente.id = ClienteServico.buscaClientes().length + 1
-        ClienteServico.clientes.push(cliente)
-    }
-
-    public static alteraCliente(cliente: Cliente): void {
-        for (let i = 0; i < ClienteServico.clientes.length; i++) {
-            let clienteDb = ClienteServico.clientes[i];
-            if (cliente.id == cliente.id) {
-                clienteDb = { ...cliente }
-            }
-            break
-        }
+    public async buscaPorId(id: Number): Promise<Cliente | undefined> {
+       return await  firstValueFrom(this.http.get<Cliente | undefined>(`${environment.api}/clientes/${id}`)) //firstValueFrom substitui o toPromise que está depricated
 
     }
 
-    public static excluirCliente(cliente: Cliente): void {
-        let listaNova = []
-        for (let i = 0; i < ClienteServico.clientes.length; i++) {
-            let clienteDb = ClienteServico.clientes[i];
-            if (cliente.id != cliente.id) {
-                listaNova.push(clienteDb)
-            }
-            break
-        }
-
-        ClienteServico.clientes = listaNova
+    public excluirPorId(id: Number): void {
+        firstValueFrom(this.http.delete(`${environment.api}/clientes/${id}`)) //firstValueFrom substitui o toPromise que está depricated
 
     }
+
+    public async criar(cliente:Cliente): Promise<Cliente | undefined> {
+        let clienteRest: Cliente | undefined = await firstValueFrom(this.http.post<Cliente>(`${environment.api}/clientes/`, cliente)) //firstValueFrom substitui o toPromise que está depricated
+
+        return clienteRest;
+    }
+
+
+    public async update(cliente:Cliente): Promise<Cliente | undefined> {
+        let clienteRest: Cliente | undefined = await firstValueFrom(this.http.put<Cliente>(`${environment.api}/clientes/${cliente.id}`, cliente)) //firstValueFrom substitui o toPromise que está depricated
+
+        return clienteRest;
+    }
+
 }

@@ -1,6 +1,8 @@
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Cliente } from 'src/app/models/cliente';
+import { ClienteObserverServicoService } from 'src/app/servicos/clienteObserverServico.service';
 import { ClienteServico } from 'src/app/servicos/clienteServico';
 
 @Component({
@@ -8,32 +10,68 @@ import { ClienteServico } from 'src/app/servicos/clienteServico';
   templateUrl: './form.component.html',
   styleUrls: ['./form.component.css']
 })
+
 export class FormComponent {
 
-  constructor(private router:Router) { }
 
-  public titulo:String = "Novo cliente" 
-  public cliente: Cliente = {} as Cliente  // propriedade Cliente
-  public valor: String = "" // para preencher com R$ no input
+  //As injeções são feitas no Construtor
+  constructor(
+    private router: Router,
+    private Http: HttpClient,
+    private routerParams: ActivatedRoute,
+    private clienteObserverServicoService: ClienteObserverServicoService) { }
 
 
+  private clienteServico: ClienteServico = {} as ClienteServico
+  public titulo: String = "Novo cliente"
+  public cliente: Cliente | undefined= {} as Cliente  // propriedade Cliente
+  public valor: any = "" // para preencher com R$ no input
 
-  ngOnInit(): void {  // quando inicia o model view, é feito tudo que está nesse bloco
-    //this.cliente = this.clientes[0]
-  }
 
-  salvar() {    // essa classe vai adicionar os dados 
-    ClienteServico.adicionarCliente({ id: 0,
-      nome: this.cliente.nome,
-      telefone: this.cliente.telefone,
-      endereco: this.cliente.endereco,
-      data: new Date(),
-      valor: this.convertNumber(this.valor),
-      cpf: "45678945612"}) ; 
-      
-      this.router.navigateByUrl("/listaCliente")
+  // quando inicia o model view, é feito tudo que está nesse bloco
+  //this.cliente = this.clientes[0]
+  ngOnInit(): void {
+    this.clienteServico = new ClienteServico(this.Http)
+    let id: Number = this.routerParams.snapshot.params['id']
+    if (id) {
+      this.editaCliente(id)
+      this.titulo = "Alterar Cliente"
+      this.cliente = ClienteServico.buscaClientesPorId(id)
+      this.valor = this.cliente.valor.toString()
+    }
+  } // esse método busca o cliente
 
-      //.push inclui o item/cadatro
+
+  private async editaCliente(id: Number) {
+    this.titulo = "Alterar Cliente"
+    this.cliente = ClienteServico.buscaClientesPorId(id)
+    this.valor = this.cliente?.valor.toString()
+  } // esse método retorna para um objeto de um cliente
+
+
+  // essa classe vai adicionar os dados 
+  salvar() {
+    if (this.valor && this.cliente && this.cliente.id > 0) {
+      this.cliente.valor = this.convertNumber(this.valor)
+      this.clienteServico.update(this.cliente)
+    }
+    else {
+      this.clienteServico.criar({
+        id: 0,
+        nome: this.cliente.nome,
+        telefone: this.cliente.telefone,
+        endereco: this.cliente.endereco,
+        data: new Date(),
+        valor: this.convertNumber(!this.valor ? 0 : this.valor),
+        cpf: "45678945612"
+      });
+    }
+
+    this.clienteObserverServicoService.atualizaQuantidade();
+    this.router.navigateByUrl("/listaCliente")
+
+
+    //.push inclui o item/cadatro
     //alert(JSON.stringify(this.cliente))  // json- mostra na tela o conteudo do cliente
   }
 
